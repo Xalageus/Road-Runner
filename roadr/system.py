@@ -13,7 +13,7 @@ DIS_HEIGHT = 512
 MAX_JOY = 2
 
 class system():
-    def __init__(self, debug_mode):
+    def __init__(self, debug_mode, debug_quit_tile_sys):
         self.printer = printer(debug_mode)
         self.printer.printInfo(0, None)
 
@@ -28,12 +28,15 @@ class system():
         self.tilesys = None
         self._running = True
         self.debug_mode = debug_mode
+        self.debug_quiet_tile_sys = debug_quit_tile_sys
         self.inputCount = 0
         self.js = [0] * MAX_JOY
         self.j0HLeft = False
         self.j0HRight = False
         self.j0A0Left = False
         self.j0A0Right = False
+        self.j0A3Up = False
+        self.j0A3Down = False
         self.mapRead = mapRead(debug_mode)
         self.timeMod = 0
         self.nextRegReport = 0
@@ -48,7 +51,7 @@ class system():
         self.assets.mergePaths()
 
     def gameInit(self):
-        self.tilesys = tile_system(self.assets.tiles, DIS_WIDTH, DIS_HEIGHT, self.debug_mode)
+        self.tilesys = tile_system(self.assets.tiles, DIS_WIDTH, DIS_HEIGHT, self.debug_mode, self.debug_quiet_tile_sys)
         map = self.mapRead.readMap(self.assets.maps[0])
         self.tilesys.setTiles(map)
         self.player = player(self.assets.objs[0], DIS_WIDTH / 2, DIS_HEIGHT * 0.8)
@@ -131,6 +134,14 @@ class system():
                 self.tilesys.scroll(self.moveSpeed, self.timeMod)
                 self.draw()
 
+        if self.debug_mode:
+            if self.j0A3Up:
+                self.tilesys.debugScroll(self.js.get_axis(3), self.timeMod, True)
+                self.draw()
+            elif self.j0A3Down:
+                self.tilesys.debugScroll(self.js.get_axis(3), self.timeMod, False)
+                self.draw()
+
     def compEvents(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -172,6 +183,21 @@ class system():
                     self.printer.printDebugInfo(9, self.inputCount, None)
                     self.j0A0Left = False
                     self.j0A0Right = False
+
+                if self.js.get_axis(3) < -0.2:
+                    if self.debug_mode:
+                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3))
+                        self.j0A3Up = True
+                        self.j0A3Down = False
+                elif self.js.get_axis(3) > 0.2:
+                    if self.debug_mode:
+                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3))
+                        self.j0A3Down = True
+                        self.j0A3Up = False
+                else:
+                    if self.debug_mode:
+                        self.j0A3Up = False
+                        self.j0A3Down = False
                 self.inputCount += 1
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F1:
