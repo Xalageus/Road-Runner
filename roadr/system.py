@@ -5,15 +5,12 @@ from roadr.printer import printer
 from roadr.player import player
 from roadr.tilesys import tile_system
 from roadr.map import mapRead
+from roadr.assets import asset_system
 
-OBJ_ASSETS = "assets\\obj"
-TILES_ASSETS = "assets\\tiles"
-MAP_ASSETS = "assets\\maps"
 FPS = 60
 DIS_WIDTH = 360
 DIS_HEIGHT = 512
 MAX_JOY = 2
-TILE_FILES = 5
 
 class system():
     def __init__(self, debug_mode):
@@ -26,10 +23,9 @@ class system():
         self.screen = pygame.display.set_mode(size=(DIS_WIDTH, DIS_HEIGHT))
         self.clock = pygame.time.Clock()
 
+        self.assets = None
         self.player = None
-        self.playerFile = None
         self.tilesys = None
-        self.tileFiles = [0] * TILE_FILES
         self._running = True
         self.debug_mode = debug_mode
         self.inputCount = 0
@@ -39,29 +35,22 @@ class system():
         self.j0A0Left = False
         self.j0A0Right = False
         self.mapRead = mapRead()
-        self.mapFile = None
         self.timeMod = 0
         self.nextFPSReport = 0
         self.j0B0 = False
 
-        self.setPaths()
+        self.getAssets()
         self.gameInit()
 
-    def setPaths(self):
-        sysDir = os.path.dirname(os.path.realpath(__file__))
-        self.playerFile = os.path.join(sysDir, OBJ_ASSETS + "\\player.bmp")
-        self.tileFiles[0] = os.path.join(sysDir, TILES_ASSETS + "\\road.bmp")
-        self.tileFiles[1] = os.path.join(sysDir, TILES_ASSETS + "\\roadTop.bmp")
-        self.tileFiles[2] = os.path.join(sysDir, TILES_ASSETS + "\\roadBottom.bmp")
-        self.tileFiles[3] = os.path.join(sysDir, TILES_ASSETS + "\\roadBare.bmp")
-        self.tileFiles[4] = os.path.join(sysDir, TILES_ASSETS + "\\grass.bmp")
-        self.mapFile = os.path.join(sysDir, MAP_ASSETS + "\\0.map")
+    def getAssets(self):
+        self.assets = asset_system()
+        self.assets.mergePaths()
 
     def gameInit(self):
-        self.tilesys = tile_system(self.tileFiles, DIS_WIDTH, DIS_HEIGHT, self.debug_mode)
-        map = self.mapRead.readMap(self.mapFile)
+        self.tilesys = tile_system(self.assets.tiles, DIS_WIDTH, DIS_HEIGHT, self.debug_mode)
+        map = self.mapRead.readMap(self.assets.maps[0])
         self.tilesys.setTiles(map)
-        self.player = player(self.playerFile, DIS_WIDTH / 2, DIS_HEIGHT * 0.8)
+        self.player = player(self.assets.objs[0], DIS_WIDTH / 2, DIS_HEIGHT * 0.8)
 
         self.draw()
         self.joystickInit()

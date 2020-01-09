@@ -5,7 +5,7 @@ class player(pygame.sprite.Sprite):
     def __init__(self, obj_file, xPos, yPos):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load(obj_file)
+        self.image = pygame.image.load(obj_file.filename)
         self.image = pygame.transform.scale(self.image, (self.image.get_size()[0] * 2, self.image.get_size()[1] * 2))
         self.image.set_colorkey((255, 0, 255))
         self.rect = self.image.get_rect()

@@ -35,7 +35,7 @@ class tile_system():
                     flip = True
 
                 if item[0] is not "#":
-                    self.tiles[tile] = road(self.tileFiles[int(item[0])], DEF_TILE_WIDTH * j, DEF_TILE_HEIGHT * i, flip)
+                    self.tiles[tile] = road(self.tileFiles[int(item[0])].filename, DEF_TILE_WIDTH * j, DEF_TILE_HEIGHT * i, flip)
                     tile += 1
                 j += 1
             i += 1

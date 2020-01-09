@@ -21,7 +21,7 @@ class mapRead():
         return newArr
 
     def readMap(self, mapFile):
-        with open(mapFile, newline='\n') as csvfile:
+        with open(mapFile.filename, newline='\n') as csvfile:
             rawMap = csv.reader(csvfile, delimiter=',')
 
             i = 0
