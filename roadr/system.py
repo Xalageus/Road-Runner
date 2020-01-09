@@ -20,7 +20,8 @@ class system():
         pygame.init()
         self.printer.printDebugInfo(1, pygame.get_sdl_version(), None)
         pygame.display.set_caption("Road Runner")
-        self.screen = pygame.display.set_mode(size=(DIS_WIDTH, DIS_HEIGHT))
+        self.screen = pygame.display.set_mode(size=(DIS_WIDTH, DIS_HEIGHT), flags=DOUBLEBUF)
+        self.screen.set_alpha(None)
         self.clock = pygame.time.Clock()
 
         self.assets = None
@@ -42,6 +43,7 @@ class system():
         self.nextRegReport = 0
         self.j0B0 = False
         self.moveSpeed = 0
+        self.loopTime = None
 
         self.getAssets()
         self.gameInit()
@@ -94,6 +96,7 @@ class system():
         if self.debug_mode:
             if pygame.time.get_ticks() > self.nextRegReport:
                 self.printer.printDebugInfo(11, self.clock.get_fps(), FPS)
+                self.printer.printDebugInfo(29, self.loopTime, None)
                 self.printer.printDebugInfo(22, self.moveSpeed, None)
                 self.nextRegReport = pygame.time.get_ticks() + 5000
 
@@ -215,4 +218,4 @@ class system():
             self.joyHold()
             self.regReport()
             self.timeMod = self.clock.get_time()
-            self.clock.tick(FPS)
+            self.loopTime = self.clock.tick(FPS)

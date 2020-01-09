@@ -79,6 +79,8 @@ class printer():
             if msg == 28:
                 print("[Debug TILE_SYS] WARNING: Less than " + str(arg) + " empty tiles were found!")
                 print("[Debug TILE_SYS] We will likely crash...")
+            if msg == 29:
+                print("[Debug SYS] Loop took " + str(arg))
 
     def printInfo(self, msg, arg):
         if msg == 0:
