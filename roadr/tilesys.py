@@ -21,6 +21,7 @@ class tile_system():
         self.map = None
         self.printer = printer(debug_mode)
         self.debug_quiet = debug_quiet
+        self.tileObjs = [0] * len(tileFiles)
 
         self.speedY = 0.2
         #Current row (from bottom to top) to draw at
@@ -29,6 +30,12 @@ class tile_system():
         self.rowCount = 0
         self.initial = True
         self.lowestYPos = 0.0
+
+    def initTileObjs(self):
+        i = 0
+        for tileF in self.tileFiles:
+            self.tileObjs[i] = road(tileF.filename, 0, 0, False)
+            i += 1
 
     def drawTile(self, tile, tilePos, j):
         """Create a tile to be drawn"""
@@ -39,16 +46,20 @@ class tile_system():
             flip = True
 
         if item[0] is not "#":
+
             if self.initial:
                 #Only on setTiles()
-                self.tiles[tilePos] = road(self.tileFiles[int(item[0])].filename, DEF_TILE_WIDTH * j, DEF_TILE_HEIGHT * self.row, flip)
+                #self.tiles[tilePos] = road(self.tileFiles[int(item[0])].filename, DEF_TILE_WIDTH * j, DEF_TILE_HEIGHT * self.row, flip)
+                self.tiles[tilePos] = self.tileObjs[int(item[0])].copy(DEF_TILE_WIDTH * j, DEF_TILE_HEIGHT * self.row, flip)
             else:
                 #Use last known lowest yPos (top most tile) minus the default tile height
-                self.tiles[tilePos] = road(self.tileFiles[int(item[0])].filename, DEF_TILE_WIDTH * j, self.lowestYPos - DEF_TILE_HEIGHT, flip)
+                #self.tiles[tilePos] = road(self.tileFiles[int(item[0])].filename, DEF_TILE_WIDTH * j, self.lowestYPos - DEF_TILE_HEIGHT, flip)
+                self.tiles[tilePos] =self.tileObjs[int(item[0])].copy(DEF_TILE_WIDTH * j, self.lowestYPos - DEF_TILE_HEIGHT, flip)
 
     def setTiles(self, map):
         """Setup the initial tiles to be drawn"""
         self.map = map
+        self.initTileObjs()
 
         self.row = HEIGHT
         tilePos = 0
