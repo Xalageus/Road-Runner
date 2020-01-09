@@ -41,7 +41,7 @@ class printer():
             if msg == 9:
                 print("[Debug SYS] Received JOYAXISMOTION (in deadzone) input " + str(arg))
             if msg == 10:
-                print("[Debug SYS] Received JOYAXISMOTION input " + str(arg) + " (" + str(argTwo) + ")")
+                print("[Debug SYS] Received JOYAXISMOTION input " + str(arg) + " (" + str(argTwo) + ") (0)")
             if msg == 11:
                 print("[Debug SYS] FPS: " + str(arg) + " / " + str(argTwo))
             if msg == 12:
@@ -66,6 +66,19 @@ class printer():
                 print("[Debug MAP_SYS] Parsed map " + str(arg))
             if msg == 22:
                 print("[Debug SYS] moveSpeed: " + str(arg))
+            if msg == 23:
+                print("[Debug SYS] Received JOYAXISMOTION input " + str(arg) + " (" + str(argTwo) + ") (3)")
+            if msg == 24:
+                print("[Debug TILE_SYS] Lowest Y Pos: " + str(arg))
+            if msg == 25:
+                print("[Debug TILE_SYS] Destroying tile " + str(arg))
+            if msg == 26:
+                print("[Debug TILE_SYS] Drawing new tile " + str(arg))
+            if msg == 27:
+                print("[Debug TILE_SYS] Tile " + str(arg) + " at " + str(argTwo))
+            if msg == 28:
+                print("[Debug TILE_SYS] WARNING: Less than " + str(arg) + " empty tiles were found!")
+                print("[Debug TILE_SYS] We will likely crash...")
 
     def printInfo(self, msg, arg):
         if msg == 0:
