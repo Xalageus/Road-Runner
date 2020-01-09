@@ -36,8 +36,9 @@ class system():
         self.j0A0Right = False
         self.mapRead = mapRead(debug_mode)
         self.timeMod = 0
-        self.nextFPSReport = 0
+        self.nextRegReport = 0
         self.j0B0 = False
+        self.moveSpeed = 0
 
         self.getAssets()
         self.gameInit()
@@ -86,11 +87,12 @@ class system():
             self.printer.printDebugInfo(8, joystick.get_numaxes(), None)
             self.printer.printDebugInfo(17, joystick.get_numbuttons(), None)
 
-    def fpsReport(self):
+    def regReport(self):
         if self.debug_mode:
-            if pygame.time.get_ticks() > self.nextFPSReport:
+            if pygame.time.get_ticks() > self.nextRegReport:
                 self.printer.printDebugInfo(11, self.clock.get_fps(), FPS)
-                self.nextFPSReport = pygame.time.get_ticks() + 5000
+                self.printer.printDebugInfo(22, self.moveSpeed, None)
+                self.nextRegReport = pygame.time.get_ticks() + 5000
 
     def draw(self):
         self.screen.fill((240, 60, 51))
@@ -116,8 +118,18 @@ class system():
             self.draw()
             
         if self.j0B0:
-            self.tilesys.scroll(0.1, self.timeMod)
+            if self.moveSpeed < 1:
+                self.moveSpeed += 0.01
+            self.tilesys.scroll(self.moveSpeed, self.timeMod)
             self.draw()
+        else:
+            if self.moveSpeed > 0:
+                self.moveSpeed -= 0.002
+            if self.moveSpeed < 0:
+                self.moveSpeed = 0
+            if self.moveSpeed is not 0:
+                self.tilesys.scroll(self.moveSpeed, self.timeMod)
+                self.draw()
 
     def compEvents(self):
         for event in pygame.event.get():
@@ -175,6 +187,6 @@ class system():
         while self._running:
             self.compEvents()
             self.joyHold()
-            self.fpsReport()
+            self.regReport()
             self.timeMod = self.clock.get_time()
             self.clock.tick(FPS)

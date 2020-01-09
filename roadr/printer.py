@@ -64,6 +64,8 @@ class printer():
                 print("[Debug ASSET_SYS] Parsed tile definitions: " + str(arg))
             if msg == 21:
                 print("[Debug MAP_SYS] Parsed map " + str(arg))
+            if msg == 22:
+                print("[Debug SYS] moveSpeed: " + str(arg))
 
     def printInfo(self, msg, arg):
         if msg == 0:
