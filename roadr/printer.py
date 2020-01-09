@@ -18,7 +18,7 @@ class printer():
 
         return string
 
-    def printDebugInfo(self, msg, arg, argTwo):
+    def printDebugInfo(self, msg, arg, argTwo, argThree):
         if(self.PRINT_DEBUG):
             if msg == 0:
                 print("[Debug SYS] # of controllers: " + str(arg))
@@ -81,6 +81,8 @@ class printer():
                 print("[Debug TILE_SYS] We will likely crash...")
             if msg == 29:
                 print("[Debug SYS] Loop took " + str(arg))
+            if msg == 30:
+                print("[Debug SYS] Stutter detected. Stutter took " + str(arg) + " ... Average of last " + str(argTwo) + " frames was " + str(argThree))
 
     def printInfo(self, msg, arg):
         if msg == 0:

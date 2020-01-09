@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import os
+import time
 from roadr.printer import printer
 from roadr.player import player
 from roadr.tilesys import tile_system
@@ -18,7 +19,7 @@ class system():
         self.printer.printInfo(0, None)
 
         pygame.init()
-        self.printer.printDebugInfo(1, pygame.get_sdl_version(), None)
+        self.printer.printDebugInfo(1, pygame.get_sdl_version(), None, None)
         pygame.display.set_caption("Road Runner")
         self.screen = pygame.display.set_mode(size=(DIS_WIDTH, DIS_HEIGHT), flags=DOUBLEBUF)
         self.screen.set_alpha(None)
@@ -44,6 +45,10 @@ class system():
         self.j0B0 = False
         self.moveSpeed = 0
         self.loopTime = None
+        self.times = [0] * FPS
+        self.timesPos = 0
+        self.fullTimes = False
+        self.timesFirst = True
 
         self.getAssets()
         self.gameInit()
@@ -63,7 +68,7 @@ class system():
 
     def joystickInit(self):
         joyCount = pygame.joystick.get_count()
-        self.printer.printDebugInfo(0, joyCount, None)
+        self.printer.printDebugInfo(0, joyCount, None, None)
         curJoy = 0
         i = 0
         while i < joyCount:
@@ -79,7 +84,7 @@ class system():
             self.printer.printInfo(1, None)
 
     def joystickReinit(self):
-        self.printer.printDebugInfo(16, None, None)
+        self.printer.printDebugInfo(16, None, None, None)
         pygame.joystick.quit()
         self.js = [0] * MAX_JOY
         pygame.joystick.init()
@@ -87,17 +92,17 @@ class system():
 
     def joystickReport(self, joystick):
         if self.debug_mode:
-            self.printer.printDebugInfo(3, joystick.get_name(), None)
-            self.printer.printDebugInfo(7, joystick.get_numhats(), None)
-            self.printer.printDebugInfo(8, joystick.get_numaxes(), None)
-            self.printer.printDebugInfo(17, joystick.get_numbuttons(), None)
+            self.printer.printDebugInfo(3, joystick.get_name(), None, None)
+            self.printer.printDebugInfo(7, joystick.get_numhats(), None, None)
+            self.printer.printDebugInfo(8, joystick.get_numaxes(), None, None)
+            self.printer.printDebugInfo(17, joystick.get_numbuttons(), None, None)
 
     def regReport(self):
         if self.debug_mode:
             if pygame.time.get_ticks() > self.nextRegReport:
-                self.printer.printDebugInfo(11, self.clock.get_fps(), FPS)
-                self.printer.printDebugInfo(29, self.loopTime, None)
-                self.printer.printDebugInfo(22, self.moveSpeed, None)
+                self.printer.printDebugInfo(11, self.clock.get_fps(), FPS, None)
+                self.printer.printDebugInfo(29, self.loopTime, None, None)
+                self.printer.printDebugInfo(22, self.moveSpeed, None, None)
                 self.nextRegReport = pygame.time.get_ticks() + 5000
 
     def draw(self):
@@ -148,21 +153,21 @@ class system():
     def compEvents(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.printer.printDebugInfo(4, None, None)
+                self.printer.printDebugInfo(4, None, None, None)
                 self._running = False
             elif event.type == pygame.JOYBUTTONUP:
-                self.printer.printDebugInfo(2, self.inputCount, None)
+                self.printer.printDebugInfo(2, self.inputCount, None, None)
                 if not self.js.get_button(0):
                     self.j0B0 = False
                 self.inputCount += 1
             elif event.type == pygame.JOYBUTTONDOWN:
-                self.printer.printDebugInfo(5, self.inputCount, None)
+                self.printer.printDebugInfo(5, self.inputCount, None, None)
                 if self.js.get_button(0):
-                    self.printer.printDebugInfo(13, None, None)
+                    self.printer.printDebugInfo(13, None, None, None)
                     self.j0B0 = True
                 self.inputCount += 1
             elif event.type == pygame.JOYHATMOTION:
-                self.printer.printDebugInfo(6, self.inputCount, None)
+                self.printer.printDebugInfo(6, self.inputCount, None, None)
                 if self.js.get_hat(0)[0] < 0:
                     self.j0HLeft = True
                     self.j0HRight = False
@@ -175,26 +180,26 @@ class system():
                 self.inputCount += 1
             elif event.type == pygame.JOYAXISMOTION:
                 if self.js.get_axis(0) < -0.2:
-                    self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0))
+                    self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
                     self.j0A0Left = True
                     self.j0A0Right = False
                 elif self.js.get_axis(0) > 0.2:
-                    self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0))
+                    self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
                     self.j0A0Right = True
                     self.j0A0Left = False
                 else:
-                    self.printer.printDebugInfo(9, self.inputCount, None)
+                    self.printer.printDebugInfo(9, self.inputCount, None, None)
                     self.j0A0Left = False
                     self.j0A0Right = False
 
                 if self.js.get_axis(3) < -0.2:
                     if self.debug_mode:
-                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3))
+                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
                         self.j0A3Up = True
                         self.j0A3Down = False
                 elif self.js.get_axis(3) > 0.2:
                     if self.debug_mode:
-                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3))
+                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
                         self.j0A3Down = True
                         self.j0A3Up = False
                 else:
@@ -205,7 +210,7 @@ class system():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F1:
                     if self.debug_mode:
-                        self.printer.printDebugInfo(15, None, None)
+                        self.printer.printDebugInfo(15, None, None, None)
                         self.tilesys.resetTiles()
                         self.draw()
                 elif event.key == pygame.K_F2:
@@ -214,8 +219,28 @@ class system():
 
     def mainLoop(self):
         while self._running:
+            startTime = time.perf_counter_ns()
             self.compEvents()
             self.joyHold()
             self.regReport()
-            self.timeMod = self.clock.get_time()
-            self.loopTime = self.clock.tick(FPS)
+            endTime = time.perf_counter_ns()
+            self.detectStutter(endTime - startTime)
+            self.loopTime = self.clock.get_rawtime()
+            self.timeMod = self.clock.tick(FPS)
+
+    def detectStutter(self, deltaTime):
+        if self.debug_mode:
+            if self.timesFirst:
+                self.times[self.timesPos] = deltaTime
+                self.timesPos += 1
+                self.timesFirst = False
+            else:
+                if self.fullTimes:
+                    timesAvg = int(sum(self.times) / FPS)
+                    if ((deltaTime + 1) / (timesAvg + 1)) > 10:
+                        self.printer.printDebugInfo(30, deltaTime, FPS, timesAvg)
+                if self.timesPos == FPS:
+                    self.timesPos = 0
+                    self.fullTimes = True
+                self.times[self.timesPos] = deltaTime
+                self.timesPos += 1
