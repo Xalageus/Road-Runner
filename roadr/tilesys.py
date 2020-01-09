@@ -3,8 +3,11 @@ from pygame.locals import *
 from roadr.road import road
 from roadr.printer import printer
 
+#Max num of tiles to draw including off screen
 TILES = 180
+#Max tiles left to right
 WIDTH = 10
+#Tile pos to start drawing from (bottom most)
 HEIGHT = 15
 DEF_TILE_WIDTH = 36
 DEF_TILE_HEIGHT = 32
@@ -20,14 +23,15 @@ class tile_system():
         self.debug_quiet = debug_quiet
 
         self.speedY = 0.2
-        self.draws = 1
+        #Current row (from bottom to top) to draw at
         self.row = 0
+        #Current num of rows read from map and drawn 
         self.rowCount = 0
-        self.lastRow = 0.0
         self.initial = True
         self.lowestYPos = 0.0
 
     def drawTile(self, tile, tilePos, j):
+        """Create a tile to be drawn"""
         item = str.split(tile, ".")
 
         flip = False
@@ -36,16 +40,20 @@ class tile_system():
 
         if item[0] is not "#":
             if self.initial:
+                #Only on setTiles()
                 self.tiles[tilePos] = road(self.tileFiles[int(item[0])].filename, DEF_TILE_WIDTH * j, DEF_TILE_HEIGHT * self.row, flip)
             else:
+                #Use last known lowest yPos (top most tile) minus the default tile height
                 self.tiles[tilePos] = road(self.tileFiles[int(item[0])].filename, DEF_TILE_WIDTH * j, self.lowestYPos - DEF_TILE_HEIGHT, flip)
 
     def setTiles(self, map):
+        """Setup the initial tiles to be drawn"""
         self.map = map
 
         self.row = HEIGHT
         tilePos = 0
         while tilePos < TILES:
+            #Tile pos to draw at
             j = 0
             for data in map[self.rowCount]:
                 self.drawTile(data, tilePos, j)
@@ -58,6 +66,7 @@ class tile_system():
         self.initial = False
 
     def findEmpty(self):
+        """Get a list of empty (0) spots in tile array"""
         empty = [-1] * WIDTH
         i = 0
         count = 0
@@ -73,6 +82,8 @@ class tile_system():
         return empty
 
     def drawRow(self, map):
+        """Draw a row of tiles at last known lowest yPos minus the
+        height of a tile"""
         tilePos = 0
         j = 0
         redraws = self.findEmpty()
@@ -85,12 +96,17 @@ class tile_system():
         self.rowCount += 1
 
     def scroll(self, mod, time):
+        """Scroll the tiles and check for tiles that are no longer
+        needed"""
         speed = self.speedY * (abs(mod) * time)
         self.lowestYPos = 32.0
 
-        nredraw = False
+        #Draw new row?
+        newRow = False
         i = 0
 
+        #Set new tile yPos for every tile, check for lowest yPos to
+        #record and check for tiles that have gone off screen
         for tile in self.tiles:
             if tile is not 0:
                 tile.yPos = tile.yPos + speed
@@ -99,7 +115,7 @@ class tile_system():
                     self.lowestYPos = tile.yPos
 
                 if tile.yPos > self.disHeight:
-                    nredraw = True
+                    newRow = True
                     self.destroyTile(i)
 
             i += 1
@@ -107,27 +123,30 @@ class tile_system():
         if not self.debug_quiet:
             self.printer.printDebugInfo(24, self.lowestYPos, None)
 
-        if nredraw:
+        if newRow:
             self.drawRow(self.map)
 
     def destroyTile(self, tile):
+        """Destroy a tile. Sets to '0'"""
         if not self.debug_quiet:
             self.printer.printDebugInfo(25, tile, None)
         self.tiles[tile] = 0
 
     def destroyTiles(self):
+        """Destroy all tiles at once"""
         self.tiles = [0] * TILES
 
     def resetTiles(self):
-        self.draws = 1
+        """Reset tile system"""
         self.row = 0
         self.rowCount = 0
-        self.lastRow = 0.0
         self.initial = True
         self.destroyTiles()
         self.setTiles(self.map)
 
     def debugScroll(self, mod, time, up):
+        """Manually scroll tiles without drawing new ones or removing
+        any"""
         speed = self.speedY * (abs(mod) * time)
 
         for tile in self.tiles:
