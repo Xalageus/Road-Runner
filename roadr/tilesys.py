@@ -49,11 +49,9 @@ class tile_system():
 
             if self.initial:
                 #Only on setTiles()
-                #self.tiles[tilePos] = road(self.tileFiles[int(item[0])].filename, DEF_TILE_WIDTH * j, DEF_TILE_HEIGHT * self.row, flip)
                 self.tiles[tilePos] = self.tileObjs[int(item[0])].copy(DEF_TILE_WIDTH * j, DEF_TILE_HEIGHT * self.row, flip)
             else:
                 #Use last known lowest yPos (top most tile) minus the default tile height
-                #self.tiles[tilePos] = road(self.tileFiles[int(item[0])].filename, DEF_TILE_WIDTH * j, self.lowestYPos - DEF_TILE_HEIGHT, flip)
                 self.tiles[tilePos] =self.tileObjs[int(item[0])].copy(DEF_TILE_WIDTH * j, self.lowestYPos - DEF_TILE_HEIGHT, flip)
 
     def setTiles(self, map):
