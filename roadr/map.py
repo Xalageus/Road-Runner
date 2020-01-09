@@ -31,6 +31,6 @@ class mapRead():
                 self.map[i] = row
                 i += 1
 
-            self.printer.printDebugInfo(21, mapFile.name, None)
+            self.printer.printDebugInfo(21, mapFile.name, None, None)
 
             return self.trim(self.map)

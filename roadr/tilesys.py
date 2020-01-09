@@ -72,7 +72,7 @@ class tile_system():
             self.rowCount += 1
             self.row -= 1
 
-        self.printer.printDebugInfo(12, tilePos, TILES)
+        self.printer.printDebugInfo(12, tilePos, TILES, None)
         self.initial = False
 
     def findEmpty(self):
@@ -87,7 +87,7 @@ class tile_system():
             i += 1
 
         if empty[9] == -1:
-            self.printer.printDebugInfo(28, WIDTH, None)
+            self.printer.printDebugInfo(28, WIDTH, None, None)
 
         return empty
 
@@ -99,7 +99,7 @@ class tile_system():
         redraws = self.findEmpty()
         for data in map[self.rowCount]:
             if not self.debug_quiet:
-                self.printer.printDebugInfo(26, redraws[tilePos], None)
+                self.printer.printDebugInfo(26, redraws[tilePos], None, None)
             self.drawTile(data, redraws[tilePos], j)
             tilePos += 1
             j += 1
@@ -131,7 +131,7 @@ class tile_system():
             i += 1
 
         if not self.debug_quiet:
-            self.printer.printDebugInfo(24, self.lowestYPos, None)
+            self.printer.printDebugInfo(24, self.lowestYPos, None, None)
 
         if newRow:
             self.drawRow(self.map)
@@ -139,7 +139,7 @@ class tile_system():
     def destroyTile(self, tile):
         """Destroy a tile. Sets to '0'"""
         if not self.debug_quiet:
-            self.printer.printDebugInfo(25, tile, None)
+            self.printer.printDebugInfo(25, tile, None, None)
         self.tiles[tile] = 0
 
     def destroyTiles(self):

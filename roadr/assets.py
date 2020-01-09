@@ -34,17 +34,17 @@ class asset_system():
         for tag in root.findall("maps/map"):
             self.maps[int(tag.find("id").text)] = asset_file(tag.find("name").text, tag.find("id").text, tag.find("file").text)
 
-        self.printer.printDebugInfo(18, len(root.findall("maps/map")), None)
+        self.printer.printDebugInfo(18, len(root.findall("maps/map")), None, None)
 
         for tag in root.findall("objs/obj"):
             self.objs[int(tag.find("id").text)] = asset_file(tag.find("name").text, tag.find("id").text, tag.find("file").text)
 
-        self.printer.printDebugInfo(19, len(root.findall("objs/obj")), None)
+        self.printer.printDebugInfo(19, len(root.findall("objs/obj")), None, None)
 
         for tag in root.findall("tiles/tile"):
             self.tiles[int(tag.find("id").text)] = asset_file(tag.find("name").text, tag.find("id").text, tag.find("file").text)
 
-        self.printer.printDebugInfo(20, len(root.findall("tiles/tile")), None)
+        self.printer.printDebugInfo(20, len(root.findall("tiles/tile")), None, None)
 
     def trim(self, arr):
         count = 0
