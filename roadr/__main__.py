@@ -1,10 +1,20 @@
+from sys import argv
 from roadr.system import system
 
-DEBUG = True
-DEBUG_QUIET_TILE_SYS = True
-
 def main():
-    sys = system(DEBUG, DEBUG_QUIET_TILE_SYS)
+    DEBUG = False
+    DEBUG_QUIET_TILE_SYS = True
+    OPENGL = True
+    
+    for arg in argv:
+        if arg == "-d":
+            DEBUG = True
+        elif arg == "-dvts":
+            DEBUG_QUIET_TILE_SYS = False
+        elif arg == "-s":
+            OPENGL = False
+
+    sys = system(DEBUG, DEBUG_QUIET_TILE_SYS, OPENGL)
     sys.mainLoop()
     
 if __name__ == "__main__":
