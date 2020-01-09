@@ -14,10 +14,10 @@ DIS_HEIGHT = 512
 MAX_JOY = 2
 
 class system():
-    def __init__(self, debug_mode, debug_quit_tile_sys):
+    def __init__(self, debug_mode, debug_quiet_tile_sys, opengl):
         self.printer = printer(debug_mode)
         self.printer.printInfo(0, None)
-
+        #TODO: Add opengl support
         pygame.init()
         self.printer.printDebugInfo(1, pygame.get_sdl_version(), None, None)
         pygame.display.set_caption("Road Runner")
@@ -30,7 +30,7 @@ class system():
         self.tilesys = None
         self._running = True
         self.debug_mode = debug_mode
-        self.debug_quiet_tile_sys = debug_quit_tile_sys
+        self.debug_quiet_tile_sys = debug_quiet_tile_sys
         self.inputCount = 0
         self.js = [0] * MAX_JOY
         self.j0HLeft = False
