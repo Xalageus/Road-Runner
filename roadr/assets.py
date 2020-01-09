@@ -1,5 +1,6 @@
 from xml.etree import ElementTree
 import os
+from roadr.printer import printer
 
 class asset_file():
     def __init__(self, name, id, filename):
@@ -8,7 +9,8 @@ class asset_file():
         self.filename = filename
 
 class asset_system():
-    def __init__(self):
+    def __init__(self, debug_mode):
+        self.printer = printer(debug_mode)
         self.maps = [0] * 1000
         self.objs = [0] * 1000
         self.tiles = [0] * 1000
@@ -32,11 +34,17 @@ class asset_system():
         for tag in root.findall("maps/map"):
             self.maps[int(tag.find("id").text)] = asset_file(tag.find("name").text, tag.find("id").text, tag.find("file").text)
 
+        self.printer.printDebugInfo(18, len(root.findall("maps/map")), None)
+
         for tag in root.findall("objs/obj"):
             self.objs[int(tag.find("id").text)] = asset_file(tag.find("name").text, tag.find("id").text, tag.find("file").text)
 
+        self.printer.printDebugInfo(19, len(root.findall("objs/obj")), None)
+
         for tag in root.findall("tiles/tile"):
             self.tiles[int(tag.find("id").text)] = asset_file(tag.find("name").text, tag.find("id").text, tag.find("file").text)
+
+        self.printer.printDebugInfo(20, len(root.findall("tiles/tile")), None)
 
     def trim(self, arr):
         count = 0

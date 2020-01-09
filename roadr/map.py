@@ -1,7 +1,9 @@
 import csv
+from roadr.printer import printer
     
 class mapRead():
-    def __init__(self):
+    def __init__(self, debug_mode):
+        self.printer = printer(debug_mode)
         self.map = [0] * 1024
 
     def trim(self, arr):
@@ -28,5 +30,7 @@ class mapRead():
             for row in rawMap:
                 self.map[i] = row
                 i += 1
+
+            self.printer.printDebugInfo(21, mapFile.name, None)
 
             return self.trim(self.map)

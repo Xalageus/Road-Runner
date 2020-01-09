@@ -34,7 +34,7 @@ class system():
         self.j0HRight = False
         self.j0A0Left = False
         self.j0A0Right = False
-        self.mapRead = mapRead()
+        self.mapRead = mapRead(debug_mode)
         self.timeMod = 0
         self.nextFPSReport = 0
         self.j0B0 = False
@@ -43,7 +43,7 @@ class system():
         self.gameInit()
 
     def getAssets(self):
-        self.assets = asset_system()
+        self.assets = asset_system(self.debug_mode)
         self.assets.mergePaths()
 
     def gameInit(self):

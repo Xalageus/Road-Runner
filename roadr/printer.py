@@ -45,7 +45,7 @@ class printer():
             if msg == 11:
                 print("[Debug SYS] FPS: " + str(arg) + " / " + str(argTwo))
             if msg == 12:
-                print("[Debug TILESYS] Tiles loaded: " + str(arg) + " / " + str(argTwo))
+                print("[Debug TILE_SYS] Tiles loaded: " + str(arg) + " / " + str(argTwo))
             if msg == 13:
                 print("[Debug SYS] Received Button 0")
             if msg == 14:
@@ -56,6 +56,14 @@ class printer():
                 print("[Debug SYS] Re-initializing controllers...")
             if msg == 17:
                 print("[Debug SYS] # of Buttons: " + str(arg))
+            if msg == 18:
+                print("[Debug ASSET_SYS] Parsed map definitions: " + str(arg))
+            if msg == 19:
+                print("[Debug ASSET_SYS] Parsed obj definitions: " + str(arg))
+            if msg == 20:
+                print("[Debug ASSET_SYS] Parsed tile definitions: " + str(arg))
+            if msg == 21:
+                print("[Debug MAP_SYS] Parsed map " + str(arg))
 
     def printInfo(self, msg, arg):
         if msg == 0:
