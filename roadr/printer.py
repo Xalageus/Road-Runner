@@ -54,6 +54,8 @@ class printer():
                 print("[Debug SYS] Resetting tiles to original state...")
             if msg == 16:
                 print("[Debug SYS] Re-initializing controllers...")
+            if msg == 17:
+                print("[Debug SYS] # of Buttons: " + str(arg))
 
     def printInfo(self, msg, arg):
         if msg == 0:

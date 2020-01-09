@@ -84,6 +84,7 @@ class system():
             self.printer.printDebugInfo(3, joystick.get_name(), None)
             self.printer.printDebugInfo(7, joystick.get_numhats(), None)
             self.printer.printDebugInfo(8, joystick.get_numaxes(), None)
+            self.printer.printDebugInfo(17, joystick.get_numbuttons(), None)
 
     def fpsReport(self):
         if self.debug_mode:
