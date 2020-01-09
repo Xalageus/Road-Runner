@@ -32,6 +32,7 @@ class tile_system():
         self.lowestYPos = 0.0
 
     def initTileObjs(self):
+        """Fill tileObjs array with usable tiles"""
         i = 0
         for tileF in self.tileFiles:
             self.tileObjs[i] = road(tileF.filename, 0, 0, False)
