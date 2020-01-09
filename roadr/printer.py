@@ -77,8 +77,7 @@ class printer():
             if msg == 27:
                 print("[Debug TILE_SYS] Tile " + str(arg) + " at " + str(argTwo))
             if msg == 28:
-                print("[Debug TILE_SYS] WARNING: Less than " + str(arg) + " empty tiles were found!")
-                print("[Debug TILE_SYS] We will likely crash...")
+                print("[Debug TILE_SYS] WARNING: Less than " + str(arg) + " empty tiles were found! We will probably crash...")
             if msg == 29:
                 print("[Debug SYS] Loop took " + str(arg))
             if msg == 30:
