@@ -83,6 +83,13 @@ class system():
         if curJoy == 0:
             self.printer.printInfo(1, None)
 
+    def joystickReinit(self):
+        self.printer.printDebugInfo(16, None, None)
+        pygame.joystick.quit()
+        self.js = [0] * MAX_JOY
+        pygame.joystick.init()
+        self.joystickInit()
+
     def joystickReport(self, joystick):
         if self.debug_mode:
             self.printer.printDebugInfo(3, joystick.get_name(), None)
@@ -170,6 +177,9 @@ class system():
                         self.printer.printDebugInfo(15, None, None)
                         self.tilesys.resetTiles()
                         self.draw()
+                elif event.key == pygame.K_F2:
+                    if self.debug_mode:
+                        self.joystickReinit()
 
     def mainLoop(self):
         while self._running:
