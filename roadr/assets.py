@@ -14,12 +14,12 @@ class asset_system():
         self.maps = [0] * 1000
         self.objs = [0] * 1000
         self.tiles = [0] * 1000
-        self.assetDir = os.path.dirname(os.path.realpath(__file__)) + "\\assets"
+        self.assetDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
         self.map_path = None
         self.obj_path = None
         self.tile_path = None
         
-        self.parseDef(self.assetDir + "\\assets.xml")
+        self.parseDef(os.path.join(self.assetDir, "assets.xml"))
         
         self.maps = self.trim(self.maps)
         self.objs = self.trim(self.objs)
@@ -64,10 +64,10 @@ class asset_system():
 
     def mergePaths(self):
         for asset in self.maps:
-            asset.filename = self.assetDir + "\\" + self.map_path + "\\" + asset.filename
+            asset.filename = os.path.join(self.assetDir, self.map_path, asset.filename)
 
         for asset in self.objs:
-            asset.filename = self.assetDir + "\\" + self.obj_path + "\\" + asset.filename
+            asset.filename = os.path.join(self.assetDir, self.obj_path, asset.filename)
         
         for asset in self.tiles:
-            asset.filename = self.assetDir + "\\" + self.tile_path + "\\" + asset.filename
+            asset.filename = os.path.join(self.assetDir, self.tile_path, asset.filename)
