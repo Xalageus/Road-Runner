@@ -14,7 +14,7 @@ DIS_HEIGHT = 512
 MAX_JOY = 2
 
 class system():
-    def __init__(self, debug_mode, debug_quiet_tile_sys, opengl):
+    def __init__(self, debug_mode, debug_quiet_tile_sys, opengl, debug_quiet_controller_input):
         self.printer = printer(debug_mode)
         self.printer.printInfo(0, None)
         #TODO: Add opengl support
@@ -31,6 +31,7 @@ class system():
         self._running = True
         self.debug_mode = debug_mode
         self.debug_quiet_tile_sys = debug_quiet_tile_sys
+        self.debug_quiet_controller_input = debug_quiet_controller_input
         self.inputCount = 0
         self.js = [0] * MAX_JOY
         self.j0HLeft = False
@@ -156,18 +157,21 @@ class system():
                 self.printer.printDebugInfo(4, None, None, None)
                 self._running = False
             elif event.type == pygame.JOYBUTTONUP:
-                self.printer.printDebugInfo(2, self.inputCount, None, None)
+                if not self.debug_quiet_controller_input:
+                    self.printer.printDebugInfo(2, self.inputCount, None, None)
                 if not self.js.get_button(0):
                     self.j0B0 = False
                 self.inputCount += 1
             elif event.type == pygame.JOYBUTTONDOWN:
-                self.printer.printDebugInfo(5, self.inputCount, None, None)
+                if not self.debug_quiet_controller_input:
+                    self.printer.printDebugInfo(5, self.inputCount, None, None)
                 if self.js.get_button(0):
                     self.printer.printDebugInfo(13, None, None, None)
                     self.j0B0 = True
                 self.inputCount += 1
             elif event.type == pygame.JOYHATMOTION:
-                self.printer.printDebugInfo(6, self.inputCount, None, None)
+                if not self.debug_quiet_controller_input:
+                    self.printer.printDebugInfo(6, self.inputCount, None, None)
                 if self.js.get_hat(0)[0] < 0:
                     self.j0HLeft = True
                     self.j0HRight = False
@@ -180,26 +184,31 @@ class system():
                 self.inputCount += 1
             elif event.type == pygame.JOYAXISMOTION:
                 if self.js.get_axis(0) < -0.2:
-                    self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
+                    if not self.debug_quiet_controller_input:
+                        self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
                     self.j0A0Left = True
                     self.j0A0Right = False
                 elif self.js.get_axis(0) > 0.2:
-                    self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
+                    if not self.debug_quiet_controller_input:
+                        self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
                     self.j0A0Right = True
                     self.j0A0Left = False
                 else:
-                    self.printer.printDebugInfo(9, self.inputCount, None, None)
+                    if not self.debug_quiet_controller_input:
+                        self.printer.printDebugInfo(9, self.inputCount, None, None)
                     self.j0A0Left = False
                     self.j0A0Right = False
 
                 if self.js.get_axis(3) < -0.2:
                     if self.debug_mode:
-                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
+                        if not self.debug_quiet_controller_input:
+                            self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
                         self.j0A3Up = True
                         self.j0A3Down = False
                 elif self.js.get_axis(3) > 0.2:
                     if self.debug_mode:
-                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
+                        if not self.debug_quiet_controller_input:
+                            self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
                         self.j0A3Down = True
                         self.j0A3Up = False
                 else:
