@@ -146,9 +146,11 @@ class system():
         if self.debug_mode:
             if self.j0A3Up:
                 self.tilesys.debugScroll(self.js.get_axis(3), self.timeMod, True)
+                self.moveSpeed = 0
                 self.draw()
             elif self.j0A3Down:
                 self.tilesys.debugScroll(self.js.get_axis(3), self.timeMod, False)
+                self.moveSpeed = 0
                 self.draw()
 
     def compEvents(self):
@@ -220,6 +222,7 @@ class system():
                 if event.key == pygame.K_F1:
                     if self.debug_mode:
                         self.printer.printDebugInfo(15, None, None, None)
+                        self.moveSpeed = 0
                         self.tilesys.resetTiles()
                         self.draw()
                 elif event.key == pygame.K_F2:
