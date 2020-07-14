@@ -17,7 +17,9 @@ def main():
         elif arg == "-dvci":
             DEBUG_QUIET_CONTROLLER_INPUT = False
 
+    #Init system, assets system, tile system, etc.
     sys = system(DEBUG, DEBUG_QUIET_TILE_SYS, OPENGL, DEBUG_QUIET_CONTROLLER_INPUT)
+    #Enter main game loop
     sys.mainLoop()
     
 if __name__ == "__main__":

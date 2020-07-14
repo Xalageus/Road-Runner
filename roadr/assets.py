@@ -11,6 +11,7 @@ class asset_file():
 class asset_system():
     def __init__(self, debug_mode):
         self.printer = printer(debug_mode)
+        #initialize max 1000 maps, objs and tiles
         self.maps = [0] * 1000
         self.objs = [0] * 1000
         self.tiles = [0] * 1000

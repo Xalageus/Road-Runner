@@ -20,11 +20,13 @@ class system():
         #TODO: Add opengl support
         pygame.init()
         self.printer.printDebugInfo(1, pygame.get_sdl_version(), None, None)
+        #Set/init pygame modules
         pygame.display.set_caption("Road Runner")
         self.screen = pygame.display.set_mode(size=(DIS_WIDTH, DIS_HEIGHT), flags=DOUBLEBUF)
         self.screen.set_alpha(None)
         self.clock = pygame.time.Clock()
 
+        #Init system vars
         self.assets = None
         self.player = None
         self.tilesys = None
@@ -51,14 +53,17 @@ class system():
         self.fullTimes = False
         self.timesFirst = True
 
+        #Finish init
         self.getAssets()
         self.gameInit()
 
     def getAssets(self):
+        """Get asset file info and full paths to the files"""
         self.assets = asset_system(self.debug_mode)
         self.assets.mergePaths()
 
     def gameInit(self):
+        """Init tile system and player, then call joystickInit"""
         self.tilesys = tile_system(self.assets.tiles, DIS_WIDTH, DIS_HEIGHT, self.debug_mode, self.debug_quiet_tile_sys)
         map = self.mapRead.readMap(self.assets.maps[0])
         self.tilesys.setTiles(map)
@@ -68,11 +73,14 @@ class system():
         self.joystickInit()
 
     def joystickInit(self):
+        """Find ready controllers then init them"""
+        #Currently only first joy is read
         joyCount = pygame.joystick.get_count()
         self.printer.printDebugInfo(0, joyCount, None, None)
         curJoy = 0
         i = 0
         while i < joyCount:
+            #Only init controllers until we reach MAX_JOY
             if curJoy < MAX_JOY:
                 self.js = pygame.joystick.Joystick(i)
                 self.js.init()
@@ -85,6 +93,7 @@ class system():
             self.printer.printInfo(1, None)
 
     def joystickReinit(self):
+        """Destroy controllers then re-init them"""
         self.printer.printDebugInfo(16, None, None, None)
         pygame.joystick.quit()
         self.js = [0] * MAX_JOY
@@ -92,6 +101,7 @@ class system():
         self.joystickInit()
 
     def joystickReport(self, joystick):
+        """Print controller info"""
         if self.debug_mode:
             self.printer.printDebugInfo(3, joystick.get_name(), None, None)
             self.printer.printDebugInfo(7, joystick.get_numhats(), None, None)
@@ -99,6 +109,7 @@ class system():
             self.printer.printDebugInfo(17, joystick.get_numbuttons(), None, None)
 
     def regReport(self):
+        """In debug mode, print current fps, time since last tick and current movement speed"""
         if self.debug_mode:
             if pygame.time.get_ticks() > self.nextRegReport:
                 self.printer.printDebugInfo(11, self.clock.get_fps(), FPS, None)
@@ -107,6 +118,7 @@ class system():
                 self.nextRegReport = pygame.time.get_ticks() + 5000
 
     def draw(self):
+        """Draw tiles, objs, HUD, menus to the screen"""
         self.screen.fill((240, 60, 51))
 
         for tile in self.tilesys.tiles:
@@ -116,6 +128,8 @@ class system():
         pygame.display.flip()
 
     def joyHold(self):
+        """Compute events when a button or axis is held down/outside of deadzone"""
+        #Move player left or right (left/right HAT or left stick)
         if self.j0HLeft:
             self.player.moveLeft(self.timeMod)
             self.draw()
@@ -129,12 +143,14 @@ class system():
             self.player.moveRightAxis(self.js.get_axis(0), self.timeMod)
             self.draw()
             
+        #Move player forward (scroll screen) (Button 0)
         if self.j0B0:
             if self.moveSpeed < 1:
                 self.moveSpeed += 0.01
             self.tilesys.scroll(self.moveSpeed, self.timeMod)
             self.draw()
         else:
+            #Gradually slow down player when button is not held down
             if self.moveSpeed > 0:
                 self.moveSpeed -= 0.002
             if self.moveSpeed < 0:
@@ -143,6 +159,8 @@ class system():
                 self.tilesys.scroll(self.moveSpeed, self.timeMod)
                 self.draw()
 
+        #If debug mode is enabled, allow player to scroll screen manually without
+        #destroying or adding tiles (up/down right stick)
         if self.debug_mode:
             if self.j0A3Up:
                 self.tilesys.debugScroll(self.js.get_axis(3), self.timeMod, True)
@@ -154,6 +172,8 @@ class system():
                 self.draw()
 
     def compEvents(self):
+        """Compute pygame events including controller button UP/DOWN and axis changes"""
+        #TODO: Clean this up/use switch statements instead of if, elif, ...
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.printer.printDebugInfo(4, None, None, None)
@@ -219,12 +239,14 @@ class system():
                         self.j0A3Down = False
                 self.inputCount += 1
             elif event.type == pygame.KEYDOWN:
+                #In debug mode only, reset tile system on Keyboard F1 press
                 if event.key == pygame.K_F1:
                     if self.debug_mode:
                         self.printer.printDebugInfo(15, None, None, None)
                         self.moveSpeed = 0
                         self.tilesys.resetTiles()
                         self.draw()
+                #In debug mode only, reinit controllers on Keyboard F2 press
                 elif event.key == pygame.K_F2:
                     if self.debug_mode:
                         self.joystickReinit()
@@ -237,7 +259,7 @@ class system():
             self.regReport()
             endTime = time.perf_counter_ns()
             self.detectStutter(endTime - startTime)
-            self.loopTime = self.clock.get_rawtime()
+            self.loopTime = self.clock.get_rawtime() #Get time in milliseconds since last tick (not including time used to lock the fps)
             self.timeMod = self.clock.tick(FPS)
 
     def detectStutter(self, deltaTime):

@@ -1,6 +1,7 @@
 from roadr.__init__ import __version__
 
 class printer():
+    """Prints debug or info messages to the console"""
     def __init__(self, debug):
         self.PRINT_DEBUG = debug
 
