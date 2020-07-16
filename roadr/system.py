@@ -188,7 +188,8 @@ class system():
                 if not self.debug_quiet_controller_input:
                     self.printer.printDebugInfo(5, self.inputCount, None, None)
                 if self.js.get_button(0):
-                    self.printer.printDebugInfo(13, None, None, None)
+                    if not self.debug_quiet_controller_input:
+                        self.printer.printDebugInfo(13, None, None, None)
                     self.j0B0 = True
                 self.inputCount += 1
             elif event.type == pygame.JOYHATMOTION:
