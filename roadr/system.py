@@ -27,9 +27,9 @@ class system():
         self.clock = pygame.time.Clock()
 
         #Init system vars
-        self.assets = None
-        self.player = None
-        self.tilesys = None
+        self.assets = None # type: asset_system
+        self.player = None # type: player
+        self.tilesys = None # type: tile_system
         self._running = True
         self.debug_mode = debug_mode
         self.debug_quiet_tile_sys = debug_quiet_tile_sys

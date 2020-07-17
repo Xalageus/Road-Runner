@@ -14,7 +14,7 @@ DEF_TILE_HEIGHT = 32
 
 class tile_system():
     def __init__(self, tileFiles, disWidth, disHeight, debug_mode, debug_quiet):
-        self.tiles = [0] * TILES
+        self.tiles = [0] * TILES # type: list[road]
         self.tileFiles = tileFiles
         self.disWidth = disWidth
         self.disHeight = disHeight
