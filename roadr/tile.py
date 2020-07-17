@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 
-class road(pygame.sprite.Sprite):
+class tile(pygame.sprite.Sprite):
     def __init__(self, obj_file, xPos, yPos, flip, obj = None):
         pygame.sprite.Sprite.__init__(self)
 
@@ -20,4 +20,4 @@ class road(pygame.sprite.Sprite):
         self.yPos = yPos
 
     def copy(self, xPos, yPos, flip):
-        return road(None, xPos, yPos, flip, obj=self.image.copy())
+        return tile(None, xPos, yPos, flip, obj=self.image.copy())

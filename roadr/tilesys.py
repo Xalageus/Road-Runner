@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from roadr.road import road
+from roadr.tile import tile
 from roadr.printer import printer
 
 #Max num of tiles to draw including off screen
@@ -14,7 +14,7 @@ DEF_TILE_HEIGHT = 32
 
 class tile_system():
     def __init__(self, tileFiles, disWidth, disHeight, debug_mode, debug_quiet):
-        self.tiles = [0] * TILES # type: list[road]
+        self.tiles = [0] * TILES # type: list[tile]
         self.tileFiles = tileFiles
         self.disWidth = disWidth
         self.disHeight = disHeight
@@ -35,7 +35,7 @@ class tile_system():
         """Fill tileObjs array with usable tiles"""
         i = 0
         for tileF in self.tileFiles:
-            self.tileObjs[i] = road(tileF.filename, 0, 0, False)
+            self.tileObjs[i] = tile(tileF.filename, 0, 0, False)
             i += 1
 
     def drawTile(self, tile, tilePos, j):
