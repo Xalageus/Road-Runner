@@ -52,6 +52,10 @@ class system():
         self.timesPos = 0
         self.fullTimes = False
         self.timesFirst = True
+        self.keyboardInput = True
+        self.kB0 = False
+        self.kLeft = False
+        self.kRight = False
 
         #Finish init
         self.getAssets()
@@ -82,6 +86,7 @@ class system():
         while i < joyCount:
             #Only init controllers until we reach MAX_JOY
             if curJoy < MAX_JOY:
+                self.keyboardInput = False
                 self.js = pygame.joystick.Joystick(i)
                 self.js.init()
                 self.joystickReport(self.js)
@@ -96,6 +101,7 @@ class system():
         """Destroy controllers then re-init them"""
         self.printer.printDebugInfo(16, None, None, None)
         pygame.joystick.quit()
+        self.keyboardInput = True
         self.js = [0] * MAX_JOY
         pygame.joystick.init()
         self.joystickInit()
@@ -171,6 +177,29 @@ class system():
                 self.moveSpeed = 0
                 self.draw()
 
+    def keyHold(self):
+        if self.kLeft:
+            self.player.moveLeft(self.timeMod)
+            self.draw()
+        elif self.kRight:
+            self.player.moveRight(self.timeMod)
+            self.draw()
+
+        if self.kB0:
+            if self.moveSpeed < 1:
+                self.moveSpeed += 0.01
+            self.tilesys.scroll(self.moveSpeed, self.timeMod)
+            self.draw()
+        else:
+            #Gradually slow down player when button is not held down
+            if self.moveSpeed > 0:
+                self.moveSpeed -= 0.002
+            if self.moveSpeed < 0:
+                self.moveSpeed = 0
+            if self.moveSpeed is not 0:
+                self.tilesys.scroll(self.moveSpeed, self.timeMod)
+                self.draw()
+
     def compEvents(self):
         """Compute pygame events including controller button UP/DOWN and axis changes"""
         #TODO: Clean this up/use switch statements instead of if, elif, ...
@@ -178,68 +207,13 @@ class system():
             if event.type == pygame.QUIT:
                 self.printer.printDebugInfo(4, None, None, None)
                 self._running = False
-            elif event.type == pygame.JOYBUTTONUP:
-                if not self.debug_quiet_controller_input:
-                    self.printer.printDebugInfo(2, self.inputCount, None, None)
-                if not self.js.get_button(0):
-                    self.j0B0 = False
-                self.inputCount += 1
-            elif event.type == pygame.JOYBUTTONDOWN:
-                if not self.debug_quiet_controller_input:
-                    self.printer.printDebugInfo(5, self.inputCount, None, None)
-                if self.js.get_button(0):
-                    if not self.debug_quiet_controller_input:
-                        self.printer.printDebugInfo(13, None, None, None)
-                    self.j0B0 = True
-                self.inputCount += 1
-            elif event.type == pygame.JOYHATMOTION:
-                if not self.debug_quiet_controller_input:
-                    self.printer.printDebugInfo(6, self.inputCount, None, None)
-                if self.js.get_hat(0)[0] < 0:
-                    self.j0HLeft = True
-                    self.j0HRight = False
-                elif self.js.get_hat(0)[0] > 0:
-                    self.j0HRight = True
-                    self.j0HLeft = False
-                else:
-                    self.j0HLeft = False
-                    self.j0HRight = False
-                self.inputCount += 1
-            elif event.type == pygame.JOYAXISMOTION:
-                if self.js.get_axis(0) < -0.2:
-                    if not self.debug_quiet_controller_input:
-                        self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
-                    self.j0A0Left = True
-                    self.j0A0Right = False
-                elif self.js.get_axis(0) > 0.2:
-                    if not self.debug_quiet_controller_input:
-                        self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
-                    self.j0A0Right = True
-                    self.j0A0Left = False
-                else:
-                    if not self.debug_quiet_controller_input:
-                        self.printer.printDebugInfo(9, self.inputCount, None, None)
-                    self.j0A0Left = False
-                    self.j0A0Right = False
 
-                if self.js.get_axis(3) < -0.2:
-                    if self.debug_mode:
-                        if not self.debug_quiet_controller_input:
-                            self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
-                        self.j0A3Up = True
-                        self.j0A3Down = False
-                elif self.js.get_axis(3) > 0.2:
-                    if self.debug_mode:
-                        if not self.debug_quiet_controller_input:
-                            self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
-                        self.j0A3Down = True
-                        self.j0A3Up = False
-                else:
-                    if self.debug_mode:
-                        self.j0A3Up = False
-                        self.j0A3Down = False
-                self.inputCount += 1
-            elif event.type == pygame.KEYDOWN:
+            if self.keyboardInput:
+                self.keyInput(event)
+            else:
+                self.joyInput(event)
+
+            if event.type == pygame.KEYDOWN:
                 #In debug mode only, reset tile system on Keyboard F1 press
                 if event.key == pygame.K_F1:
                     if self.debug_mode:
@@ -252,11 +226,96 @@ class system():
                     if self.debug_mode:
                         self.joystickReinit()
 
+    def joyInput(self, pygEvent):
+        if pygEvent.type == pygame.JOYBUTTONUP:
+            if not self.debug_quiet_controller_input:
+                self.printer.printDebugInfo(2, self.inputCount, None, None)
+            if not self.js.get_button(0):
+                self.j0B0 = False
+            self.inputCount += 1
+        elif pygEvent.type == pygame.JOYBUTTONDOWN:
+            if not self.debug_quiet_controller_input:
+                self.printer.printDebugInfo(5, self.inputCount, None, None)
+            if self.js.get_button(0):
+                if not self.debug_quiet_controller_input:
+                    self.printer.printDebugInfo(13, None, None, None)
+                self.j0B0 = True
+            self.inputCount += 1
+        elif pygEvent.type == pygame.JOYHATMOTION:
+            if not self.debug_quiet_controller_input:
+                self.printer.printDebugInfo(6, self.inputCount, None, None)
+            if self.js.get_hat(0)[0] < 0:
+                self.j0HLeft = True
+                self.j0HRight = False
+            elif self.js.get_hat(0)[0] > 0:
+                self.j0HRight = True
+                self.j0HLeft = False
+            else:
+                self.j0HLeft = False
+                self.j0HRight = False
+            self.inputCount += 1
+        elif pygEvent.type == pygame.JOYAXISMOTION:
+            if self.js.get_axis(0) < -0.2:
+                if not self.debug_quiet_controller_input:
+                    self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
+                self.j0A0Left = True
+                self.j0A0Right = False
+            elif self.js.get_axis(0) > 0.2:
+                if not self.debug_quiet_controller_input:
+                    self.printer.printDebugInfo(10, self.inputCount, self.js.get_axis(0), None)
+                self.j0A0Right = True
+                self.j0A0Left = False
+            else:
+                if not self.debug_quiet_controller_input:
+                    self.printer.printDebugInfo(9, self.inputCount, None, None)
+                self.j0A0Left = False
+                self.j0A0Right = False
+
+            if self.js.get_axis(3) < -0.2:
+                if self.debug_mode:
+                    if not self.debug_quiet_controller_input:
+                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
+                    self.j0A3Up = True
+                    self.j0A3Down = False
+            elif self.js.get_axis(3) > 0.2:
+                if self.debug_mode:
+                    if not self.debug_quiet_controller_input:
+                        self.printer.printDebugInfo(23, self.inputCount, self.js.get_axis(3), None)
+                    self.j0A3Down = True
+                    self.j0A3Up = False
+            else:
+                if self.debug_mode:
+                    self.j0A3Up = False
+                    self.j0A3Down = False
+            self.inputCount += 1
+
+    def keyInput(self, pygEvent):
+        if pygEvent.type == pygame.KEYDOWN:
+            if pygEvent.key == pygame.K_z:
+                self.kB0 = True
+            if pygEvent.key == pygame.K_LEFT:
+                self.kLeft = True
+                self.kRight = False
+            if pygEvent.key == pygame.K_RIGHT:
+                self.kRight = True
+                self.kLeft = False
+        elif pygEvent.type == pygame.KEYUP:
+            if pygEvent.key == pygame.K_z:
+                self.kB0 = False
+            if pygEvent.key == pygame.K_LEFT:
+                self.kLeft = False
+            if pygEvent.key == pygame.K_RIGHT:
+                self.kRight = False
+
     def mainLoop(self):
         while self._running:
             startTime = time.perf_counter_ns()
             self.compEvents()
-            self.joyHold()
+            if self.keyboardInput:
+                self.keyHold()
+            else:
+                self.joyHold()
+
             self.regReport()
             endTime = time.perf_counter_ns()
             self.detectStutter(endTime - startTime)
